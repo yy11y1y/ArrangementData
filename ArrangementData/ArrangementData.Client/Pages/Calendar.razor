@@ -1,0 +1,107 @@
+﻿@page "/calendar"
+@rendermode InteractiveAuto
+
+<div class="calendar-container">
+    <div class="calendar">
+        <h5>A床</h5>
+        <table style="width: 65%;">
+            <thead>
+                <tr>
+                    <th></th>
+                    @foreach (var day in Enumerable.Range(0, 10))
+                    {
+                        <th>@currentDate.AddDays(day).ToString("M/d")</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var period in new[] { "上午", "下午" })
+                {
+                    <tr>
+                        <td>@period</td>
+                        @foreach (var day in Enumerable.Range(0, 10))
+                        {
+                            <td><button @onclick="() => SetCurrentDate(currentDate.AddDays(day))">+</button></td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="calendar">
+        <h5>B床</h5>
+        <table style="width: 65%;">
+            <thead>
+                <tr>
+                    <th></th>
+                    @foreach (var day in Enumerable.Range(0, 10))
+                    {
+                        <th>@currentDate.AddDays(day).ToString("M/d")</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var period in new[] { "上午", "下午" })
+                {
+                    <tr>
+                        <td>@period</td>
+                        @foreach (var day in Enumerable.Range(0, 10))
+                        {
+                            <td><button @onclick="() => SetCurrentDate(currentDate.AddDays(day))">+</button></td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <button class="btn btn-primary" @onclick="NavigateToNextPage"> 回清單</button>
+
+</div>
+
+@code {
+    DateTime currentDate = DateTime.Today;
+
+    void SetCurrentDate(DateTime date)
+    {
+        currentDate = date;
+    }
+    private void NavigateToNextPage()
+    {
+        NavigationManager.NavigateTo("manage-arrange");
+    }
+}
+
+<style>
+    .calendar-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .calendar {
+        margin-bottom: 20px;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        padding: 8px;
+        text-align: center;
+    }
+
+    th {
+        border-bottom: 1px solid black; /* Add bottom border to header cells */
+    }
+
+    td {
+        border-right: 1px solid black; /* Add right border to data cells */
+    }
+
+    h5 {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+</style>

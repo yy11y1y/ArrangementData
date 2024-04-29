@@ -1,0 +1,94 @@
+﻿@page "/arrangelist"
+@rendermode InteractiveAuto
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-40">
+            <div class="card">
+                <div class="card">
+                    <div class="card-header"> <button class="btn btn-primary float-end" @onclick="NavigateToAddArrangementPage"> 新增預約 </button></div>
+                </div>
+                @if (Arranges.Count > 0)
+                {
+                    <div class="card-header"> 已預約清單 </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>預約編號</th>
+                                    <th>護理站</th>
+                                    <th>床位</th>
+                                    <th>已排病歷號</th>
+                                    <th>日期</th>
+                                    <th>時段</th>
+                                    <th>操作者</th>
+                                    <th>操作時間 </th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var arrange in Arranges)
+                                {
+                                    <tr>
+                                        <td>@arrange.Id</td>
+                                        <td>@arrange.Nursing_station</td>
+                                        <td>@arrange.Bed_Id</td>
+                                        <td>@arrange.Patient_Id</td>
+                                        <td>@arrange.Date?.ToShortDateString()</td>
+                                        <td>@arrange.Slot</td>
+                                        <td>@arrange.Operator</td>
+                                        <td>@arrange.Operating_time</td>
+                                        <td>
+                                            <div class="hstack gap-2">
+                                                <button class="btn  btn-info" @onclick="()=>Edit(arrange)"> Edit</button>
+                                                <button class="btn  btn-danger" @onclick="() => Delete(arrange.Id)"> Delete</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">尚無任何預約紀錄</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<Arrange> Arranges { get; set; } = new();
+
+    private async Task LoadArranges()
+    {
+        var arranges = await ArrangeService.GetAllArrangesAsync();
+        Arranges?.Clear();
+        if (Arranges is null) return;
+        foreach (var arrange in arranges)
+            Arranges.Add(arrange);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadArranges();
+    }
+
+    private void NavigateToAddArrangementPage()
+    {
+        NavigationManager.NavigateTo("calendar");
+    }
+
+    private void Edit(Arrange model)
+    {
+        NavigationManager.NavigateTo($"manage-arrange/{model.Id}");
+    }
+
+    private async Task Delete(int Id)
+    {
+        var arrange_Data = await ArrangeService.DeleteArrangeAsync(Id);
+        await LoadArranges();
+    }
+}

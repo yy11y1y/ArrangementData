@@ -1,0 +1,121 @@
+﻿@page "/manage-arrange"
+@page "/manage-arrange/{Id:int}"
+@rendermode InteractiveAuto
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-30">
+            <div class="card">
+                <div class="card-header">新增預約</div>
+                <div class="card-body">
+                    <EditForm Model="ArrangeModel" OnValidSubmit="HandleSave">
+                        <DataAnnotationsValidator />
+                        <div class="form-group">
+                            <label class="form-label">護理站</label>
+                            <InputText @bind-Value="ArrangeModel.Nursing_station" class="form-control"></InputText>
+                            <ValidationMessage For="()=>ArrangeModel.Nursing_station"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">床位</label>
+                            <select @bind="ArrangeModel.Bed_Id" class="form-control">
+                                <option>請選擇床位</option>
+                                <option>A床</option>
+                                <option>B床</option>
+                            </select>
+                            <ValidationMessage For="@(() => ArrangeModel.Bed_Id)"></ValidationMessage>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">欲排病歷號</label>
+                            <InputText @bind-Value="ArrangeModel.Patient_Id" class="form-control"></InputText>
+                            <ValidationMessage For="()=>ArrangeModel.Patient_Id"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">日期</label>
+                            <InputDate @bind-Value="ArrangeModel.Date" class="form-control"></InputDate>
+                            <ValidationMessage For="()=>ArrangeModel.Date"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">時段</label>
+                            <select @bind="ArrangeModel.Slot" class="form-control">
+                                <option>請選擇時段</option>
+                                <option value="Morning">上午</option>
+                                <option value="Afternoon">下午</option>
+                            </select>
+                            <ValidationMessage For="@(() => ArrangeModel.Slot)"></ValidationMessage>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">操作人員</label>
+                            <InputText @bind-Value="ArrangeModel.Operator" class="form-control"></InputText>
+                            <ValidationMessage For="()=>ArrangeModel.Operator"></ValidationMessage>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">操作時間</label>
+                            <InputDate @bind-Value="ArrangeModel.Operating_time" class="form-control"></InputDate>
+                            <ValidationMessage For="()=>ArrangeModel.Operating_time"></ValidationMessage>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary"> 儲存</button>
+                        <button class="btn btn-primary" @onclick="NavigateToListPage"> 回清單</button>
+
+
+                    </EditForm>
+                </div>
+
+                <div class="card-footer">
+                    Id:@ReturnArrange.Id<br/>
+                    Nursing Station:@ReturnArrange.Nursing_station <br />
+                    Bed_Id: @ReturnArrange.Bed_Id <br />
+                    Patient_Id: @ReturnArrange.Patient_Id <br />
+                    Date: @ReturnArrange.Date?.ToShortDateString() <br />
+                    Slot: @ReturnArrange.Slot <br />
+                    Operator: @ReturnArrange.Operator<br />
+                    Operating Time: @ReturnArrange.Operating_time.ToString("yyyy-MM-dd HH:mm:ss") <br />
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    public Arrange ArrangeModel { get; set; } = new();
+
+    [Parameter] public int Id { get; set; }
+
+    private Arrange ReturnArrange = new Arrange();
+
+    private async Task HandleSave()
+    {
+
+        if (ArrangeModel.Id > 0)
+        {
+            ReturnArrange = await ArrangeService.UpdateArrangeAsync(ArrangeModel);
+            ArrangeModel = new();
+        }
+
+        else
+        {
+            ReturnArrange = await ArrangeService.AddArrangeAsync(ArrangeModel);
+            ArrangeModel = new();
+
+        }
+
+    }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id > 0)
+            ArrangeModel = await ArrangeService.GetArrangeByIdAsync(Id);
+    }
+
+    private void NavigateToListPage()
+    {
+        NavigationManager.NavigateTo("arrangelist");
+    }
+}
