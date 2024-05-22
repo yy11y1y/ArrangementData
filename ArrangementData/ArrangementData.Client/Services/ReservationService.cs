@@ -1,6 +1,7 @@
-﻿using SharedLibrary.ArrangeRepositories;
+﻿using SharedLibrary.ReservationRepositories1;
 using SharedLibrary.Models;
 using System.Net.Http.Json;
+using static SharedLibrary.Models.Reservation;
 
 namespace ArrangementData.Client.Services
 {

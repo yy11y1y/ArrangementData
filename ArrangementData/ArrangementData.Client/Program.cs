@@ -1,6 +1,7 @@
 using ArrangementData.Client.Services;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using SharedLibrary.ArrangeRepositories;
+using SharedLibrary.ReservationRepositories1;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.Services.AddScoped<IArrangeRepository, ArrangeService>();

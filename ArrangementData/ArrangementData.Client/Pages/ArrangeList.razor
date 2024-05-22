@@ -1,4 +1,4 @@
-﻿@page "/arrangelist"
+﻿@* @page "/arrangelist"
 @rendermode InteractiveAuto
 @using static SharedLibrary.Models.Arrange
 @inject IArrangeRepository ArrangeRepository
@@ -101,4 +101,4 @@
         var arrange_Data = await ArrangeService.DeleteArrangeAsync(Id);
         await LoadArranges();
     }
-}
+} *@

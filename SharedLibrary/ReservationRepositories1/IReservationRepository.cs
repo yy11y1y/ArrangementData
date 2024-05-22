@@ -1,6 +1,6 @@
 ﻿using SharedLibrary.Models;
 
-namespace SharedLibrary.ArrangeRepositories
+namespace SharedLibrary.ReservationRepositories1
 {
     public interface IReservationRepository
     {
