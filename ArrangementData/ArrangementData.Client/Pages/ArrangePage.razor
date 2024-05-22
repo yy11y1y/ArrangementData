@@ -1,0 +1,125 @@
+﻿@page "/arrangepage"
+@rendermode InteractiveAuto
+@using static SharedLibrary.Models.Reservation
+@using SharedLibrary.ArrangeRepositories
+@inject IArrangeRepository ArrangeRepository
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-30">
+            <div class="card">
+                <div class="card-header">新增預約</div>
+                <div class="card-body">
+                    <EditForm Model="ReservationModel" OnValidSubmit="HandleSave">
+                        <DataAnnotationsValidator />
+                        <div class="form-group">
+                            <label class="form-label">護理站</label>
+                            <InputText @bind-Value="ReservationModel.NursingStation" class="form-control"></InputText>
+                            <ValidationMessage For="()=>ReservationModel.NursingStation"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">床位</label>
+                            <select @bind="ReservationModel.BedId" class="form-control">
+                                <option>請選擇床位</option>
+                                <option>A床</option>
+                                <option>B床</option>
+                            </select>
+                            <ValidationMessage For="@(() => ReservationModel.BedId)"></ValidationMessage>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">欲排病歷號</label>
+                            <InputText @bind-Value="ReservationModel.PatientId" class="form-control"></InputText>
+                            <ValidationMessage For="()=>ReservationModel.PatientId"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">日期</label>
+                            <InputDate @bind-Value="ReservationModel.Day" class="form-control"></InputDate>
+                            <ValidationMessage For="()=>ReservationModel.Day"></ValidationMessage>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">時段</label>
+                            <select @bind="ReservationModel.SlOt" class="form-control">
+                                <option>請選擇時段</option>
+                                <option value="Morning">上午</option>
+                                <option value="Afternoon">下午</option>
+                            </select>
+                            <ValidationMessage For="@(() => ReservationModel.SlOt)"></ValidationMessage>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">操作人員</label>
+                            <InputText @bind-Value="ReservationModel.OperatOr" class="form-control"></InputText>
+                            <ValidationMessage For="()=>ReservationModel.OperatOr"></ValidationMessage>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">操作時間</label>
+                            <InputDate @bind-Value="ReservationModel.OperatingTime" class="form-control"></InputDate>
+                            <ValidationMessage For="()=>ReservationModel.OperatingTime"></ValidationMessage>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary"> 儲存</button>
+                        <button class="btn btn-primary" @onclick="NavigateToListPage"> 回清單</button>
+
+
+                    </EditForm>
+                </div>
+
+                <div class="card-footer">
+                    Id:@ReturnReservation.Id<br />
+                    Nursing Station:@ReturnReservation.NursingStation <br />
+                    Bed_Id: @ReturnReservation.BedId <br />
+                    Patient_Id: @ReturnReservation.PatientId <br />
+                    Date: @ReturnReservation.Day.ToShortDateString() <br />
+                    Slot: @ReturnReservation.SlOt <br />
+                    Operator: @ReturnReservation.OperatOr<br />
+                    Operating Time: @ReturnReservation.OperatingTime.ToString("yyyy-MM-dd HH:mm:ss") <br />
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+
+    public Reservation ReservationModel { get; set; } = new();
+
+    [Parameter] public int Id { get; set; }
+
+    private Reservation ReturnReservation = new Reservation();
+
+    private async Task HandleSave()
+    {
+
+        if (ReservationModel.Id > 0)
+        {
+            ReturnReservation = await ArrangeService.UpdateReservationAsync(ReservationModel);
+            ReservationModel = new();
+        }
+
+        else
+        {
+            ReturnReservation = await ArrangeService.AddReservationAsync(ReservationModel);
+            ReservationModel = new();
+
+        }
+
+    }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id > 0)
+            ReservationModel = await ArrangeService.GetReservationByIdAsync(Id);
+    }
+
+    private void NavigateToListPage()
+    {
+        NavigationManager.NavigateTo("arrangelist");
+    }
+} 

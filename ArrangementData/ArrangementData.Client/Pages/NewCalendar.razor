@@ -1,0 +1,209 @@
+﻿@page "/newcalendar"
+@inject NavigationManager NavigationManager
+
+<h5>病床A</h5>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th></th>
+            @foreach (var date in dates)
+            {
+                <th>@date.ToString("MM/dd")</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>上午</td>
+            @foreach (var date in dates)
+            {
+                <td>
+                    <button class="btn @(GetButtonStyle(date, "上午"))" @onclick='() => OnButtonClick(date, " 上午")'>@GetButtonText(date, "上午")</button>
+                </td>
+            }
+        </tr>
+        <tr>
+            <td>下午</td>
+            @foreach (var date in dates)
+            {
+                <td>
+                    <button class="btn @(GetButtonStyle(date, "下午"))" @onclick='() => OnButtonClick(date, " 下午")'>@GetButtonText(date, "下午")</button>
+                </td>
+            }
+        </tr>
+    </tbody>
+</table>
+
+@if (!string.IsNullOrEmpty(selectedTime))
+{
+    <p>你選擇了: @selectedTime</p>
+}
+
+<h5>病床B</h5>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th></th>
+            @foreach (var date in dates)
+            {
+                <th>@date.ToString("MM/dd")</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>上午</td>
+            @foreach (var date in dates)
+            {
+                <td>
+                    <button class="btn @(GetButtonStyle(date, "上午", "B"))" @onclick='() => OnButtonClick(date, "上午", "B")'>@GetButtonText(date, "上午", "B")</button>
+                </td>
+            }
+        </tr>
+        <tr>
+            <td>下午</td>
+            @foreach (var date in dates)
+            {
+                <td>
+                    <button class="btn @(GetButtonStyle(date, "下午", "B"))" @onclick='() => OnButtonClick(date, "下午", "B")'>@GetButtonText(date, "下午", "B")</button>
+                </td>
+            }
+        </tr>
+    </tbody>
+</table>
+@code {
+    private DateTime startDate = new DateTime(2024, 5, 27);
+    private DateTime endDate = new DateTime(2024, 6, 5);
+    private List<DateTime> dates;
+    private string selectedTime;
+
+    protected override void OnInitialized()
+    {
+        dates = new List<DateTime>();
+        for (var date = startDate; date <= endDate; date = date.AddDays(1))
+        {
+            dates.Add(date);
+        }
+    }
+
+    private void OnButtonClick(DateTime date, string timePeriod)
+    {
+        selectedTime = $"{date.ToString("MM/dd")} {timePeriod}";
+        NavigationManager.NavigateTo("/arrangepage");
+    }
+
+    // 在此添加病床 B 特定的逻辑
+    private string GetButtonStyle(DateTime date, string timePeriod, string bed)
+    {
+        // 仅当日期为 6 月 1 日且时间段为下午时，按钮样式为已满
+        if (date == new DateTime(2024, 6, 1) && timePeriod == "下午")
+        {
+            return "btn-secondary-disabled"; 
+        }
+        else
+        {
+            return "btn-primary"; // 其他日期和时间段的按钮样式为可预约
+        }
+    }
+
+    // 在此添加病床 B 特定的逻辑
+    private string GetButtonText(DateTime date, string timePeriod, string bed)
+    {
+        // 仅当日期为 6 月 1 日且时间段为下午时，按钮文字为已满，其他情况为“點我預約”
+        if (date == new DateTime(2024, 6, 1) && timePeriod == "下午")
+        {
+            return "已滿"; // 6/1 下午已满
+        }
+        else
+        {
+            return "點我預約"; // 其他日期和时间段的按钮文字为“點我預約”
+        }
+    }
+
+    // 修改方法签名以包含病床信息
+    private void OnButtonClick(DateTime date, string timePeriod, string bed)
+    {
+        selectedTime = $"{date.ToString("MM/dd")} {timePeriod} - {bed}"; // 记录选择的日期、时间段和病床信息
+        NavigationManager.NavigateTo("/arrangepage");
+    }
+
+
+
+    private string GetButtonStyle(DateTime date, string timePeriod)
+    {
+        if ((date == new DateTime(2024, 5, 27) && timePeriod == "上午") ||
+            (date == new DateTime(2024, 5, 30) && timePeriod == "下午") ||
+            (date == new DateTime(2024, 6, 2) && timePeriod == "下午") ||
+            (date == new DateTime(2024, 6, 3) && timePeriod == "上午") ||
+            (date == new DateTime(2024, 6, 5) && (timePeriod == "上午" || timePeriod == "下午")))
+        {
+            return "btn-secondary-disabled"; // 深色不可點擊按鈕
+        }
+        else
+        {
+            return "btn-primary"; // 淺色可以點擊按鈕
+        }
+    }
+
+    private string GetButtonText(DateTime date, string timePeriod)
+    {
+        if ((date == new DateTime(2024, 5, 27) && timePeriod == "上午") ||
+            (date == new DateTime(2024, 5, 30) && timePeriod == "下午") ||
+            (date == new DateTime(2024, 6, 2) && timePeriod == "下午") ||
+            (date == new DateTime(2024, 6, 3) && timePeriod == "上午") ||
+            (date == new DateTime(2024, 6, 5) && (timePeriod == "上午" || timePeriod == "下午")))
+        {
+            return "已滿"; // 已滿文字
+        }
+        else
+        {
+            return "點我預約"; // 點我預約文字
+        }
+    }
+}
+
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    .btn {
+        width: 100px;
+        height: 40px;
+        font-size: 14px;
+    }
+
+    .btn-secondary-disabled {
+        background-color: #6c757d;
+        color: #fff;
+        border: 1px solid #6c757d;
+        pointer-events: none;
+    }
+
+    .btn-primary {
+        background-color: #C7C7E2;
+        color: #3C3C3C;
+        border: 1px solid #C7C7E2;
+    }
+
+        .btn-primary:hover {
+            background-color: #6c757d;
+        }
+
+    table th,
+    table td {
+        border: none;
+    }
+</style>

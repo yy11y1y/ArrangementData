@@ -1,33 +1,44 @@
-﻿@page "/calendar"
+﻿@* @page "/calendar"
 @rendermode InteractiveAuto
+@using SharedLibrary.Models
+@using static SharedLibrary.Models.Arrange
 
 <div class="calendar-container">
-    <div class="calendar">
-        <h5>A床</h5>
-        <table style="width: 65%;">
-            <thead>
-                <tr>
+
+<div class="bed-calendar">
+        <h4>Bed A</h4>
+<table class="calendar-table">
+    <thead>
+        <tr>
                     <th></th>
-                    @foreach (var day in Enumerable.Range(0, 10))
-                    {
-                        <th>@currentDate.AddDays(day).ToString("M/d")</th>
-                    }
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var period in new[] { "上午", "下午" })
+            @foreach (var day in Enumerable.Range(12, 10))
+                {
+                    var Date = new DateTime(2024, 5, day);
+                    <th>@Date.ToString("M/d")</th>
+                 }
+         </tr>
+     </thead>
+    <tbody>
+                @foreach (var slot in new List<string> { "上午", "下午" })
                 {
                     <tr>
-                        <td>@period</td>
-                        @foreach (var day in Enumerable.Range(0, 10))
-                        {
-                            <td><button @onclick="() => SetCurrentDate(currentDate.AddDays(day))">+</button></td>
-                        }
+                        <td>@slot</td>
+                               @foreach (var day in Enumerable.Range(12, 10))
+                                {
+                                    var Date = new DateTime(2024, 5, day);
+                                    var IsReserved = IsSlotReserved("A", Date, Slot );
+                                    var buttonClass = IsReserved ? "reserved" : "";
+                                    var buttonText = IsReserved ? "已排預約" : "可預約";
+                            <td>
+                                <button class="calendar-button @buttonClass" @onclick='() => ReserveSlot("A", Date, Slot)' disabled="@IsReserved">@buttonText</button>
+                            </td>
+                                }
                     </tr>
                 }
             </tbody>
-        </table>
-    </div>
+</table>
+</div>
+
     <div class="calendar">
         <h5>B床</h5>
         <table style="width: 65%;">
@@ -36,19 +47,17 @@
                     <th></th>
                     @foreach (var day in Enumerable.Range(0, 10))
                     {
-                        <th>@currentDate.AddDays(day).ToString("M/d")</th>
+                        var date = new DateTime(2024, 5, 12).AddDays(day);
+                        <th>@date.ToString("M/d")</th>
                     }
                 </tr>
             </thead>
             <tbody>
-                @foreach (var period in new[] { "上午", "下午" })
+                <!-- 日曆表格的內容 -->
+                @foreach (var arrange in Arranges)
                 {
                     <tr>
-                        <td>@period</td>
-                        @foreach (var day in Enumerable.Range(0, 10))
-                        {
-                            <td><button @onclick="() => SetCurrentDate(currentDate.AddDays(day))">+</button></td>
-                        }
+                        <td></td>
                     </tr>
                 }
             </tbody>
@@ -60,15 +69,49 @@
 </div>
 
 @code {
-    DateTime currentDate = DateTime.Today;
+    [Inject] private IArrangeRepository ArrangeRepository{ get; set; }
+    [Parameter] public string Bed_Id { get; set; }
+    [Parameter] public DateTime Date { get; set; }
+    [Parameter] public TimeSlot Slot { get; set; }
+    [Parameter] public bool IsReserved { get; set; }
+    [Parameter] public string Patient_Id { get; set; }
 
-    void SetCurrentDate(DateTime date)
+
+    // string? Bed_Id;
+    // DateTime Date;
+    // TimeSlot Slot;
+    // bool IsReserved;
+    // string? Patient_Id;
+
+    private IEnumerable<Arrange> Arranges { get; set; } = new List<Arrange>();
+
+    private async Task LoadArranges()
     {
-        currentDate = date;
+        var arranges = await ArrangeService.GetArrangementAsync(Bed_Id, Date, Slot, IsReserved, Patient_Id);
+        Arranges = arranges ?? Enumerable.Empty<Arrange>();
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadArranges();
+    }
+    private void ReserveSlot(string Bed_Id, DateTime Date, TimeSlot Slot )
+    {
+        NavigationManager.NavigateTo($"manage-arrange/{Bed_Id}/{Date.ToString("yyyy-MM-dd")}/{Slot}");
+    }
+
+    private bool IsSlotReserved(string Bed_Id, DateTime Date, TimeSlot Slot)
+    {
+        //檢查指定床位、日期和時段是否已預約，根據病歷號是否為空來決定是否可以預約
+        // bool isReserved = Arranges.Any(a => a.Bed_Id == Bed_Id && a.Date?.Date == Date.Date && a.Slot == Slot && !string.IsNullOrEmpty(a.Patient_Id));
+        // return isReserved;
+        return Arranges.Any(a => a.Bed_Id == Bed_Id && a.Date?.Date == Date.Date && a.Slot == Slot && !string.IsNullOrEmpty(a.Patient_Id));
+
+    }
+
     private void NavigateToNextPage()
     {
-        NavigationManager.NavigateTo("manage-arrange");
+        NavigationManager.NavigateTo("arrangelist");
     }
 }
 
@@ -105,3 +148,4 @@
         margin-bottom: 0.5rem;
     }
 </style>
+ *@

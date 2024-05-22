@@ -15,6 +15,7 @@ namespace SharedLibrary.Models
         public TimeSlot? Slot { get; set; }
         public string? Operator { get; set; } = string.Empty;
         public DateTime Operating_time { get; set; }
+        public bool IsReserved { get; set; } // 是否已預約
 
         public Arrange()
         {
@@ -26,6 +27,10 @@ namespace SharedLibrary.Models
         {
             Morning,
             Afternoon
+        }
+        public void SetIsReserved()
+        {
+            IsReserved = !string.IsNullOrEmpty(Patient_Id);
         }
 
     }

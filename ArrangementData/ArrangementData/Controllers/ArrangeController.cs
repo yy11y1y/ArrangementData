@@ -1,16 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SharedLibrary.Models;
 using SharedLibrary.ArrangeRepositories;
+using static SharedLibrary.Models.Arrange;
+using ArrangementData.Implementions;
 namespace ArrangementData.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class ArrangeController : ControllerBase
     {
-        private readonly IArrangeRepository arrangeRepository;
+        private readonly ArrangeRepository arrangeRepository;
         public ArrangeController(IArrangeRepository arrangeRepository)
         {
-            this.arrangeRepository = arrangeRepository;
+            this.arrangeRepository = (ArrangeRepository?)arrangeRepository;
         }
 
         [HttpGet("All-Arranges")]
@@ -25,6 +27,17 @@ namespace ArrangementData.Controllers
         {
             var arrange = await arrangeRepository.GetArrangeByIdAsync(id);
             return Ok(arrange);
+        }
+
+        [HttpGet("All-Arranges/{Bed_Id}/{Date}/{Slot}/{IsReserved}/{Patient_Id}")]
+        public async Task<IActionResult> GetArrangementAsync([FromQuery] string Bed_Id, [FromQuery] DateTime Date, [FromQuery] TimeSlot Slot, [FromQuery] bool IsReserved, [FromQuery] string Patient_Id)
+        {
+            var arranges = await arrangeRepository.GetArrangementAsync(Bed_Id, Date, Slot, IsReserved, Patient_Id);
+            if (arranges == null || !arranges.Any())
+            {
+                return NotFound();
+            }
+            return Ok(arranges);
         }
 
         [HttpPost("Add-Arrange")]
@@ -49,3 +62,15 @@ namespace ArrangementData.Controllers
         }
     }
 }
+
+
+//[HttpGet("Get-Arrange")]
+//public async Task<ActionResult<Arrange>> GetArrangementAsync(string Bed_Id, DateTime Date, TimeSlot Slot, bool IsReserved , string Patient_Id, string Operator)
+//{
+//    var arrange = await arrangeRepository.GetArrangementAsync(Bed_Id, Date, Slot ,IsReserved , Patient_Id,);
+//    if (arrange == null)
+//    {
+//        return NotFound();
+//    }
+//    return Ok(arrange);
+//}

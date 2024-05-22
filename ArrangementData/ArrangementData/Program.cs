@@ -1,7 +1,7 @@
 using ArrangementData.Client.Pages;
 using ArrangementData.Components;
 using ArrangementData.Data;
-using Demo.Implementations;
+using ArrangementData.Implementions;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.ArrangeRepositories;
 
@@ -19,7 +19,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 builder.Services.AddScoped<IArrangeRepository, ArrangeRepository>();
-
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped(http => new HttpClient
 {
     BaseAddress = new Uri(builder.Configuration.GetSection("BaseAddress").Value!)

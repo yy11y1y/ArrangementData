@@ -1,6 +1,10 @@
-﻿@page "/manage-arrange"
+﻿@* @page "/manage-arrange"
 @page "/manage-arrange/{Id:int}"
 @rendermode InteractiveAuto
+@using static SharedLibrary.Models.Arrange
+@using SharedLibrary.ArrangeRepositories
+@inject IArrangeRepository ArrangeRepository
+
 
 <div class="container">
     <div class="row">
@@ -83,6 +87,7 @@
 
 
 @code {
+
     public Arrange ArrangeModel { get; set; } = new();
 
     [Parameter] public int Id { get; set; }
@@ -118,4 +123,4 @@
     {
         NavigationManager.NavigateTo("arrangelist");
     }
-}
+} *@

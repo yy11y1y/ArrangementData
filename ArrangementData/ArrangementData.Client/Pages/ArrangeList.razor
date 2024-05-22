@@ -1,12 +1,17 @@
 ﻿@page "/arrangelist"
 @rendermode InteractiveAuto
+@using static SharedLibrary.Models.Arrange
+@inject IArrangeRepository ArrangeRepository
+@using SharedLibrary.ArrangeRepositories
 
 <div class="container">
     <div class="row">
         <div class="col-md-40">
             <div class="card">
                 <div class="card">
-                    <div class="card-header"> <button class="btn btn-primary float-end" @onclick="NavigateToAddArrangementPage"> 新增預約 </button></div>
+                    <div class="card-header">
+                        <button class="btn btn-primary float-end" @onclick="NavigateToAddArrangementPageWithoutArgs">新增預約</button>
+                    </div>
                 </div>
                 @if (Arranges.Count > 0)
                 {
@@ -76,11 +81,16 @@
         await LoadArranges();
     }
 
-    private void NavigateToAddArrangementPage()
+    private void NavigateToAddArrangementPage(string Bed_Id, DateTime Date, TimeSlot slot, bool IsReserved, string Patient_Id)
     {
-        NavigationManager.NavigateTo("calendar");
+        var formattedDate = Date.ToString("yyyy-MM-dd");
+        NavigationManager.NavigateTo("/calendar/{Bed_Id}/{formattedDate}/{Slot}/{IsReserved}/{Patient_Id}");
     }
-
+    private void NavigateToAddArrangementPageWithoutArgs()
+    {
+        // 这里可以设置一个默认的传递值，或者其他处理逻辑
+        NavigationManager.NavigateTo("/calendar");
+    }
     private void Edit(Arrange model)
     {
         NavigationManager.NavigateTo($"manage-arrange/{model.Id}");

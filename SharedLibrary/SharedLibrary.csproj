@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ReservationRepositories\**" />
+    <EmbeddedResource Remove="ReservationRepositories\**" />
+    <None Remove="ReservationRepositories\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Graph" Version="5.49.0" />
   </ItemGroup>
 

@@ -4,6 +4,7 @@ using SharedLibrary.ArrangeRepositories;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.Services.AddScoped<IArrangeRepository, ArrangeService>();
+builder.Services.AddScoped<IReservationRepository,ReservationService>();
 
 builder.Services.AddScoped(http => new HttpClient
 {
