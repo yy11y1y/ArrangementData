@@ -1,7 +1,6 @@
 ﻿using SharedLibrary.ReservationRepositories1;
 using SharedLibrary.Models;
 using System.Net.Http.Json;
-using static SharedLibrary.Models.Reservation;
 
 namespace ArrangementData.Client.Services
 {
@@ -47,5 +46,19 @@ namespace ArrangementData.Client.Services
             var response = await reservation.Content.ReadFromJsonAsync<Reservation>();
             return response!;
         }
+        public async Task<List<Reservation>> GetReservationByDateAsync(DateTime startDate, DateTime endDate)
+        {
+            var response = await httpClient.GetFromJsonAsync<List<Reservation>>($"api/Reservation/daterange?startDate={startDate:yyyy-MM-dd}&endDate={endDate:yyyy-MM-dd}");
+            var reservations = response ?? new List<Reservation>();
+
+            Console.WriteLine($"Retrieved {reservations.Count} reservations"); // 添加日志
+            foreach (var res in reservations)
+            {
+                Console.WriteLine($"Reservation ID: {res.Id}, Day: {res.Day}, Slot: {res.SlOt}, BedId: {res.BedId}");
+            }
+
+            return reservations;
+        }
+
     }
 }

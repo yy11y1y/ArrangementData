@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SharedLibrary.ReservationRepositories1;
 using SharedLibrary.Models;
+using ArrangementData.Client.Services;
 
 namespace Arrangementdata.Controllers
 {
@@ -53,6 +54,13 @@ namespace Arrangementdata.Controllers
         {
             var isreserved = await reservationRepository.IsSlotReservedAsync(date, slot);
             return Ok(isreserved);
+        }
+
+        [HttpGet("daterange")]
+        public async Task<ActionResult<List<Reservation>>> GetReservationByDate([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        {
+            var reservations = await reservationRepository.GetReservationByDateAsync(startDate, endDate);
+            return Ok(reservations);
         }
     }
 }

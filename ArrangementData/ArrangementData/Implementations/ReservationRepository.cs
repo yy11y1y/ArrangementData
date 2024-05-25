@@ -2,7 +2,6 @@
 using ArrangementData.Data;
 using SharedLibrary.Models;
 using Microsoft.EntityFrameworkCore;
-using static SharedLibrary.Models.Reservation;
 
 namespace ArrangementData.Implementions
 {
@@ -14,7 +13,6 @@ namespace ArrangementData.Implementions
         {
             this.appDbContext = appDbContext;
         }
-
         public async Task<bool> IsSlotReservedAsync(DateTime date, string slot)
         {
             return await appDbContext.Reservations.AllAsync(r => r.Day.Date == date.Date && r.SlOt == slot && !string.IsNullOrEmpty(r.PatientId));
@@ -30,9 +28,9 @@ namespace ArrangementData.Implementions
 
         public async Task<Reservation> AddReservationAsync(Reservation model)
         {
-            if (model is null) return null!;
-            var chk = await appDbContext.Reservations.Where(_ => _.PatientId.ToLower().Equals(model.PatientId.ToLower())).FirstOrDefaultAsync();
-            if (chk is not null) return null!;
+            //if (model is null) return null!;
+            //var chk = await appDbContext.Reservations.Where(_ => _.PatientId.ToLower().Equals(model.PatientId.ToLower())).FirstOrDefaultAsync();
+            //if (chk is not null) return null!;
 
             var newDataAdded = appDbContext.Reservations.Add(model).Entity;
             await appDbContext.SaveChangesAsync();
@@ -62,5 +60,16 @@ namespace ArrangementData.Implementions
             await appDbContext.SaveChangesAsync();
             return reservation;
         }
+        public async Task<List<Reservation>> GetReservationByDateAsync(DateTime startDate, DateTime endDate)
+        {
+            var reservations = await appDbContext.Reservations
+                .Where(r => r.Day >= startDate && r.Day <= endDate)
+                .ToListAsync();
+            if (reservations is null) return new List<Reservation>();
+            return reservations;
+        }
+
+
+        
     }
 }

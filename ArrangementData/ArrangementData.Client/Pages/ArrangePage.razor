@@ -1,9 +1,8 @@
-﻿@page "/arrangepage"
+﻿@page "/arrangepage/{Day}/{SlOt}/{BedId}"
 @rendermode InteractiveAuto
 @using static SharedLibrary.Models.Reservation
 @using SharedLibrary.ReservationRepositories1
-@inject IReservationRepository ReservationRepository
-
+@inject IReservationRepository ReservationService
 
 <div class="container">
     <div class="row">
@@ -20,10 +19,8 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">床位</label>
-                            <select @bind="ReservationModel.BedId" class="form-control">
-                                <option>請選擇床位</option>
-                                <option>A床</option>
-                                <option>B床</option>
+                            <select disabled class="form-control">
+                                <option>@BedId</option>
                             </select>
                             <ValidationMessage For="@(() => ReservationModel.BedId)"></ValidationMessage>
                         </div>
@@ -41,9 +38,7 @@
                         <div class="form-group">
                             <label class="form-label">時段</label>
                             <select @bind="ReservationModel.SlOt" class="form-control">
-                                <option>請選擇時段</option>
-                                <option value="Morning">上午</option>
-                                <option value="Afternoon">下午</option>
+                                <option>@SlOt</option>
                             </select>
                             <ValidationMessage For="@(() => ReservationModel.SlOt)"></ValidationMessage>
                         </div>
@@ -89,37 +84,27 @@
 
     public Reservation ReservationModel { get; set; } = new();
 
-    [Parameter] public int Id { get; set; }
+    [Parameter] public DateTime Day { get; set; }
+    [Parameter] public string BedId { get; set; }
+    [Parameter] public string SlOt { get; set; }
 
     private Reservation ReturnReservation = new Reservation();
 
-    private async Task HandleSave()
+    protected override async Task OnInitializedAsync()
     {
-
-        if (ReservationModel.Id > 0)
-        {
-            ReturnReservation = await ArrangeService.UpdateReservationAsync(ReservationModel);
-            ReservationModel = new();
-        }
-
-        else
-        {
-            ReturnReservation = await ArrangeService.AddReservationAsync(ReservationModel);
-            ReservationModel = new();
-
-        }
-
+        ReservationModel.Day = Day;
+        ReservationModel.BedId = BedId;
+        ReservationModel.SlOt = SlOt;
     }
 
-
-    protected override async Task OnParametersSetAsync()
+    private async Task HandleSave()
     {
-        if (Id > 0)
-            ReservationModel = await ArrangeService.GetReservationByIdAsync(Id);
+            ReturnReservation = await ReservationService.AddReservationAsync(ReservationModel);
+            ReservationModel = new();
     }
 
     private void NavigateToListPage()
     {
-        NavigationManager.NavigateTo("arrangelist");
+        NavigationManager.NavigateTo("reservationlist");
     }
 } 

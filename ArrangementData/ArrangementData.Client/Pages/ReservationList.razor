@@ -1,0 +1,99 @@
+﻿@page "/reservationlist"
+@rendermode InteractiveAuto
+@using static SharedLibrary.Models.Reservation
+@using SharedLibrary.ReservationRepositories1
+@inject IReservationRepository ReservationService
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-40">
+            <div class="card">
+                <div class="card">
+                    <div class="card-header">
+                        <button class="btn btn-primary float-end" @onclick="NavigateToAddArrangementPage">新增預約</button>
+                    </div>
+                </div>
+                @if (Reservations.Count > 0)
+                {
+                    <div class="card-header"> 已預約清單 </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>預約編號</th>
+                                    <th>護理站</th>
+                                    <th>床位</th>
+                                    <th>已排病歷號</th>
+                                    <th>日期</th>
+                                    <th>時段</th>
+                                    <th>操作者</th>
+                                    <th>操作時間 </th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var reservation in Reservations)
+                                {
+                                    <tr>
+                                        <td>@reservation.Id</td>
+                                        <td>@reservation.NursingStation</td>
+                                        <td>@reservation.BedId</td>
+                                        <td>@reservation.PatientId</td>
+                                        <td>@reservation.Day.ToShortDateString()</td>
+                                        <td>@reservation.SlOt</td>
+                                        <td>@reservation.OperatOr</td>
+                                        <td>@reservation.OperatingTime</td>
+                                        <td>
+                                            <div class="hstack gap-2">
+                                                <button class="btn  btn-info" @onclick="()=>Edit(reservation)"> Edit</button>
+                                                <button class="btn  btn-danger" @onclick="() => Delete(reservation.Id)"> Delete</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">尚無任何預約紀錄</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<Reservation> Reservations { get; set; } = new();
+
+    private async Task LoadReservations()
+    {
+        var reservations = await ReservationService.GetAllReservationsAsync();
+        Reservations?.Clear();
+        if (Reservations is null) return;
+        foreach (var reservation in reservations)
+            Reservations.Add(reservation);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadReservations();
+    }
+
+    private void NavigateToAddArrangementPage()
+    {
+        NavigationManager.NavigateTo("/newcalendar");
+    }
+
+    private void Edit(Reservation model)
+    {
+        NavigationManager.NavigateTo($"manage-arrange/{model.Id}");
+    }
+
+    private async Task Delete(int Id)
+    {
+        var areservation = await ReservationService.DeleteReservationAsync(Id);
+        await LoadReservations();
+    }
+}

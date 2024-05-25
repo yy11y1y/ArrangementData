@@ -3,7 +3,6 @@ using ArrangementData.Components;
 using ArrangementData.Data;
 using ArrangementData.Implementions;
 using Microsoft.EntityFrameworkCore;
-using SharedLibrary.ArrangeRepositories;
 using SharedLibrary.ReservationRepositories1;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,8 +18,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Wooo! Connection is not found"));
 });
 
-builder.Services.AddScoped<IArrangeRepository, ArrangeRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+
 builder.Services.AddScoped(http => new HttpClient
 {
     BaseAddress = new Uri(builder.Configuration.GetSection("BaseAddress").Value!)
