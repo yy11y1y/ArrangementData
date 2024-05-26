@@ -1,102 +1,113 @@
 ﻿@page "/newcalendar"
-@rendermode InteractiveAuto
 @inject IReservationRepository ReservationService
 @using SharedLibrary.ReservationRepositories1
 @using static SharedLibrary.Models.Reservation
 
-<h5>病床A</h5>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th></th>
-            @foreach (var date in dates)
-            {
-                <th>@date.ToString("MM/dd")</th>
-            }
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>上午</td>
-            @foreach (var date in dates)
-            {
-                <td>
-                    @{
-                        var reservation = reservations.FirstOrDefault(r => r.Day.Date == date.Date && r.SlOt == "上午" && r.BedId == "A");
-                    }
-                    <button class="btn btn-primary" @onclick='() => Edit(reservation)'>
-                        @reservation?.Id ?? "空"
-                    </button>
-                </td>
-            }
-        </tr>
-        <tr>
-            <td>下午</td>
-            @foreach (var date in dates)
-            {
-                <td>
-                    @{
-                        var reservation = reservations.FirstOrDefault(r => r.Day.Date == date.Date && r.SlOt == "下午" && r.BedId == "A");
-                    }
-                    <button class="btn btn-primary" @onclick='() => Edit(reservation)'>
-                        @reservation?.Id ?? "空"
-                    </button>
-                </td>
-            }
-        </tr>
-    </tbody>
-</table>
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (hasError)
+{
+    <p>Error loading reservations.</p>
+}
+else if (reservations != null && reservations.Any())
+{
+    <h5>病床A</h5>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th></th>
+                @foreach (var date in dates)
+                {
+                    <th>@date.ToString("MM/dd")</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>上午</td>
+                @foreach (var date in dates)
+                {
+                    <td>
+                        @{
+                            var reservation = reservations.FirstOrDefault(r => r.Day.Date == date.Date && r.SlOt == "上午" && r.BedId == "A");
+                        }
+                        <button class="btn btn-primary" @onclick="()=> Edit(reservation)">點我預約</button>
+                    </td>
+                }
+            </tr>
+            <tr>
+                <td>下午</td>
+                @foreach (var date in dates)
+                {
+                    <td>
+                        @{
+                            var reservation = reservations.FirstOrDefault(r => r.Day.Date == date.Date && r.SlOt == "下午" && r.BedId == "A");
+                        }
+                        <button class="btn btn-primary" @onclick="()=>Edit(reservation)">
+                            點我預約@((reservation?.Id.ToString() ?? "空"))
+                        </button>
+                    </td>
+                }
+            </tr>
+        </tbody>
+    </table>
 
-
-<h5>病床B</h5>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th></th>
-            @foreach (var date in dates)
-            {
-                <th>@date.ToString("MM/dd")</th>
-            }
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>上午</td>
-            @foreach (var date in dates)
-            {
-                <td>
-                    @{
-                        var reservation = reservations.FirstOrDefault(r => r.Day.Date == date.Date && r.SlOt == "上午" && r.BedId == "B");
-                    }
-                    <button class="btn btn-primary" @onclick='() => Edit(reservation)'>
-                        @reservation?.Id ?? "空"
-                    </button>
-                </td>
-            }
-        </tr>
-        <tr>
-            <td>下午</td>
-            @foreach (var date in dates)
-            {
-                <td>
-                    @{
-                        var reservation = reservations.FirstOrDefault(r => r.Day.Date == date.Date && r.SlOt == "下午" && r.BedId == "B");
-                    }
-                    <button class="btn btn-primary" @onclick='() => Edit(reservation)'>
-                        @reservation?.Id ?? "空"
-                    </button>
-                </td>
-            }
-        </tr>
-    </tbody>
-</table>
+    <h5>病床B</h5>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th></th>
+                @foreach (var date in dates)
+                {
+                    <th>@date.ToString("MM/dd")</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>上午</td>
+                @foreach (var date in dates)
+                {
+                    <td>
+                        @{
+                            var reservation = reservations.FirstOrDefault(r => r.Day.Date == date.Date && r.SlOt == "上午" && r.BedId == "B");
+                        }
+                        <button class="btn btn-primary" @onclick="()=>Edit(reservation)">
+                            點我預約@((reservation?.Id.ToString() ?? "空"))
+                        </button>
+                    </td>
+                }
+            </tr>
+            <tr>
+                <td>下午</td>
+                @foreach (var date in dates)
+                {
+                    <td>
+                        @{
+                            var reservation = reservations.FirstOrDefault(r => r.Day.Date == date.Date && r.SlOt == "下午" && r.BedId == "B");
+                        }
+                        <button class="btn btn-primary" @onclick="()=>Edit(reservation)">點我預約@((reservation?.Id.ToString() ?? "空"))</button>
+                    </td>
+                }
+            </tr>
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No reservations found.</p>
+}
 
 @code {
     private DateTime startDate = new DateTime(2024, 5, 27);
     private DateTime endDate = new DateTime(2024, 6, 5);
 
     private List<DateTime> dates;
-    private List<Reservation> reservations;
+    private List<Reservation> reservations { get; set; } = new();
+    private bool isLoading = true;
+    private bool hasError = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -105,16 +116,35 @@
         {
             dates.Add(date);
         }
-        reservations = await ReservationService.GetReservationByDateAsync(startDate, endDate);
-        if (reservations == null)
+
+        try
         {
-            reservations = new List<Reservation>();
+            Console.WriteLine("Fetching reservations...");
+            reservations = await ReservationService.GetAllReservationsAsync();
+            if (reservations == null || !reservations.Any())
+            {
+                Console.WriteLine("No reservations found.");
+                reservations = new List<Reservation>();
+            }
+            else
+            {
+                Console.WriteLine($"Fetched {reservations.Count} reservations.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error fetching reservations: {ex.Message}");
+            hasError = true;
+        }
+        finally
+        {
+            isLoading = false;
         }
     }
 
-    private async void Edit(Reservation model)
+    private void Edit(Reservation model)
     {
-        NavigationManager.NavigateTo($"arrangepage/{model.Day}/{model.SlOt}/{model.BedId}");
+        NavigationManager.NavigateTo($"arrangepage/{model.Id}");
     }
 }
 

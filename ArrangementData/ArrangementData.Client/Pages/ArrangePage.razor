@@ -1,4 +1,4 @@
-﻿@page "/arrangepage/{Day}/{SlOt}/{BedId}"
+﻿@page "/arrangepage/{Id:int}"
 @rendermode InteractiveAuto
 @using static SharedLibrary.Models.Reservation
 @using SharedLibrary.ReservationRepositories1
@@ -84,6 +84,7 @@
 
     public Reservation ReservationModel { get; set; } = new();
 
+    [Parameter] public int Id { get; set; }
     [Parameter] public DateTime Day { get; set; }
     [Parameter] public string BedId { get; set; }
     [Parameter] public string SlOt { get; set; }
@@ -95,11 +96,12 @@
         ReservationModel.Day = Day;
         ReservationModel.BedId = BedId;
         ReservationModel.SlOt = SlOt;
+        ReservationModel = await ReservationService.GetReservationByIdAsync(Id);
     }
 
     private async Task HandleSave()
     {
-            ReturnReservation = await ReservationService.AddReservationAsync(ReservationModel);
+            ReturnReservation = await ReservationService.UpdateReservationAsync(ReservationModel);
             ReservationModel = new();
     }
 

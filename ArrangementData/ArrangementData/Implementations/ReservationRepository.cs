@@ -17,8 +17,11 @@ namespace ArrangementData.Implementions
         {
             return await appDbContext.Reservations.AllAsync(r => r.Day.Date == date.Date && r.SlOt == slot && !string.IsNullOrEmpty(r.PatientId));
         }
-        public async Task<List<Reservation>> GetAllReservationsAsync() => await appDbContext.Reservations.ToListAsync();
-
+        public async Task<List<Reservation>> GetAllReservationsAsync()
+        {
+            var reservations = await appDbContext.Reservations.ToListAsync();
+            return reservations ?? new List<Reservation>(); // 確保不返回 null
+        }
         public async Task<Reservation> GetReservationByIdAsync(int reservationId)
         {
             var reservation = await appDbContext.Reservations.FirstOrDefaultAsync(_ => _.Id == reservationId);
