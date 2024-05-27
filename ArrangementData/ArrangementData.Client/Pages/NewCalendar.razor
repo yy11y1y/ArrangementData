@@ -2,19 +2,15 @@
 @inject IReservationRepository ReservationService
 @using SharedLibrary.ReservationRepositories1
 @using static SharedLibrary.Models.Reservation
+@inject NavigationManager NavigationManager
 
-@if (isLoading)
+@if (Reservations.Count > 0)
 {
-    <p>Loading...</p>
-}
-else if (hasError)
-{
-    <p>Error loading reservations.</p>
-}
-else if (reservations != null && reservations.Any())
-{
-    <h5>病床A</h5>
-    <table class="table table-bordered">
+<h6 class="center-content">
+    <img src="/images/1.jpg" style="width: 40px; height: 40px;" />
+    <span class="special-font"> A</span>
+</h6>        
+<table class="table table-bordered">
         <thead>
             <tr>
                 <th></th>
@@ -26,36 +22,62 @@ else if (reservations != null && reservations.Any())
         </thead>
         <tbody>
             <tr>
-                <td>上午</td>
+                <td>
+                    <span>☀️</span> <!-- 太陽圖示表示上午 -->
+                    <br />
+                    <small>9:00-13:00</small>
+                </td>
                 @foreach (var date in dates)
                 {
-                    <td>
+                    <td class="align-middle">
                         @{
-                            var reservation = reservations.FirstOrDefault(r => r.Day.Date == date.Date && r.SlOt == "上午" && r.BedId == "A");
+                            var reservation = Reservations.FirstOrDefault(r => r.Day.Date == date.Date && r.SlOt == "morning" && r.BedId == "A");
+                            var isReserved = !string.IsNullOrEmpty(reservation?.PatientId);
                         }
-                        <button class="btn btn-primary" @onclick="()=> Edit(reservation)">點我預約</button>
+                        @if (isReserved)
+                        {
+                            <button class="btn btn-secondary-disabled" disabled>預約已滿</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary" @onclick="()=>Edit(reservation)">點我預約</button>
+                        }
                     </td>
+
                 }
             </tr>
             <tr>
-                <td>下午</td>
+                <td>
+                    <span>🌙</span> <!-- 月亮圖示表示下午 -->
+                    <br />
+                    <small>14:00-18:00</small>
+                </td>
                 @foreach (var date in dates)
                 {
-                    <td>
+                    <td class="align-middle">
                         @{
-                            var reservation = reservations.FirstOrDefault(r => r.Day.Date == date.Date && r.SlOt == "下午" && r.BedId == "A");
+                            var reservation = Reservations.FirstOrDefault(r => r.Day.Date == date.Date && r.SlOt == "afternoon" && r.BedId == "A");
+                            var isReserved = !string.IsNullOrEmpty(reservation?.PatientId);
                         }
-                        <button class="btn btn-primary" @onclick="()=>Edit(reservation)">
-                            點我預約@((reservation?.Id.ToString() ?? "空"))
-                        </button>
+                        @if (isReserved)
+                        {
+                            <button class="btn btn-secondary-disabled" disabled>預約已滿</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary" @onclick="()=>Edit(reservation)">點我預約</button>
+                        }
                     </td>
+
                 }
             </tr>
         </tbody>
     </table>
 
-    <h5>病床B</h5>
-    <table class="table table-bordered">
+<h6 class="center-content">
+    <img src="/images/1.jpg" style="width: 40px; height: 40px;" />
+    <span class="special-font"> B</span>
+</h6>            <table class="table table-bordered">
         <thead>
             <tr>
                 <th></th>
@@ -67,29 +89,51 @@ else if (reservations != null && reservations.Any())
         </thead>
         <tbody>
             <tr>
-                <td>上午</td>
-                @foreach (var date in dates)
+                <td>
+                    <span>☀️</span> <!-- 太陽圖示表示上午 -->
+                    <br />
+                    <small>9:00-13:00</small>
+                </td>                @foreach (var date in dates)
                 {
-                    <td>
+                    <td class="align-middle">
                         @{
-                            var reservation = reservations.FirstOrDefault(r => r.Day.Date == date.Date && r.SlOt == "上午" && r.BedId == "B");
+                            var reservation = Reservations.FirstOrDefault(r => r.Day.Date == date.Date && r.SlOt == "morning" && r.BedId == "B");
+                            var isReserved = !string.IsNullOrEmpty(reservation?.PatientId);
                         }
-                        <button class="btn btn-primary" @onclick="()=>Edit(reservation)">
-                            點我預約@((reservation?.Id.ToString() ?? "空"))
-                        </button>
+                        @if (isReserved)
+                        {
+                            <button class="btn btn-secondary-disabled" disabled>預約已滿</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary" @onclick="()=>Edit(reservation)">點我預約</button>
+                        }
                     </td>
+
                 }
             </tr>
             <tr>
-                <td>下午</td>
-                @foreach (var date in dates)
+                <td>
+                    <span>🌙</span> <!-- 月亮圖示表示下午 -->
+                    <br />
+                    <small>14:00-18:00</small>
+                </td>                @foreach (var date in dates)
                 {
-                    <td>
+                            <td class="align-middle">
                         @{
-                            var reservation = reservations.FirstOrDefault(r => r.Day.Date == date.Date && r.SlOt == "下午" && r.BedId == "B");
+                            var reservation = Reservations.FirstOrDefault(r => r.Day.Date == date.Date && r.SlOt == "afternoon" && r.BedId == "B");
+                            var isReserved = !string.IsNullOrEmpty(reservation?.PatientId);
                         }
-                        <button class="btn btn-primary" @onclick="()=>Edit(reservation)">點我預約@((reservation?.Id.ToString() ?? "空"))</button>
+                        @if (isReserved)
+                        {
+                            <button class="btn btn-secondary-disabled" disabled>預約已滿</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary" @onclick="()=>Edit(reservation)">點我預約</button>
+                        }
                     </td>
+
                 }
             </tr>
         </tbody>
@@ -100,46 +144,33 @@ else
     <p>No reservations found.</p>
 }
 
+
 @code {
     private DateTime startDate = new DateTime(2024, 5, 27);
     private DateTime endDate = new DateTime(2024, 6, 5);
 
     private List<DateTime> dates;
-    private List<Reservation> reservations { get; set; } = new();
     private bool isLoading = true;
     private bool hasError = false;
 
-    protected override async Task OnInitializedAsync()
+    private List<Reservation> Reservations { get; set; } = new();
+
+    private  async Task LoadReservations()
     {
         dates = new List<DateTime>();
         for (var date = startDate; date <= endDate; date = date.AddDays(1))
         {
             dates.Add(date);
         }
-
-        try
-        {
-            Console.WriteLine("Fetching reservations...");
-            reservations = await ReservationService.GetAllReservationsAsync();
-            if (reservations == null || !reservations.Any())
-            {
-                Console.WriteLine("No reservations found.");
-                reservations = new List<Reservation>();
-            }
-            else
-            {
-                Console.WriteLine($"Fetched {reservations.Count} reservations.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error fetching reservations: {ex.Message}");
-            hasError = true;
-        }
-        finally
-        {
-            isLoading = false;
-        }
+        var reservations = await ReservationService.GetAllReservationsAsync();
+        Reservations?.Clear();
+        if (Reservations is null) return;
+        foreach (var reservation in reservations)
+            Reservations.Add(reservation);
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadReservations();
     }
 
     private void Edit(Reservation model)
@@ -150,15 +181,20 @@ else
 
 
 <style>
+    .table-container {
+        max-width: 100%;
+        overflow:auto;
+    }
     table {
         width: 100%;
-        border-collapse: collapse;
+        table-layout: fixed;
     }
 
     th, td {
         border: 1px solid #ddd;
         padding: 8px;
         text-align: center;
+        white-space: nowrap; /* Prevent text wrapping */
     }
 
     th {
@@ -166,22 +202,22 @@ else
     }
 
     .btn {
-        width: 100px;
-        height: 40px;
+        width: 80px;
+        height: 35px;
         font-size: 14px;
+        font-weight: bold;
     }
 
     .btn-secondary-disabled {
-        background-color: #6c757d;
+        background-color: #675a6b;
         color: #fff;
-        border: 1px solid #6c757d;
-        pointer-events: none;
+        border: 1px solid #675a6b;
     }
 
     .btn-primary {
-        background-color: #C7C7E2;
-        color: #3C3C3C;
-        border: 1px solid #C7C7E2;
+        background-color: #bbafaf;
+        color: #fff;
+        border: 1px solid #bbafaf;
     }
 
         .btn-primary:hover {
@@ -191,5 +227,20 @@ else
     table th,
     table td {
         border: none;
+    }
+    .center-content {
+        display: flex;
+        align-items: center; /* 垂直置中 */
+    }
+    .special-font {
+        font-family: 'Blippo', fantasy;
+        font-size: 30px;
+        /* 如果字體名稱帶有空格，請用單引號括起來 */
+    }
+        .time-slot {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* 垂直置中 */
+        justify-content: center; /* 水平置中 */
     }
 </style>

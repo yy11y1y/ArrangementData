@@ -14,5 +14,11 @@ namespace SharedLibrary.Models
         public string SlOt { get; set; } = string.Empty;
         public string OperatOr { get; set; } = string.Empty;
         public DateTime OperatingTime { get; set; }
+
+        public Reservation()
+        {
+            OperatingTime = DateTime.Now;
+            Day = DateTime.Now;
+        }
     }
 }

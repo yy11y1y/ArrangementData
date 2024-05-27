@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SharedLibrary.ReservationRepositories1;
 using SharedLibrary.Models;
-
 namespace Arrangementdata.Controllers
 {
     [Route("api/[controller]")]
@@ -9,10 +8,11 @@ namespace Arrangementdata.Controllers
     public class ReservationController : ControllerBase
     {
         private readonly IReservationRepository reservationRepository;
-        public ReservationController(IReservationRepository reservationrepository)
+        public ReservationController(IReservationRepository reservationRepository)
         {
             this.reservationRepository = reservationRepository;
         }
+
         [HttpGet("All-Reservations")]
         public async Task<ActionResult<List<Reservation>>> GetAllReservationsAsync()
         {

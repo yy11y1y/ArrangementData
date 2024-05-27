@@ -1,4 +1,5 @@
-﻿@page "/arrangepage/{Id:int}"
+﻿@page "/arrangepage"
+@page "/arrangepage/{Id:int}"
 @rendermode InteractiveAuto
 @using static SharedLibrary.Models.Reservation
 @using SharedLibrary.ReservationRepositories1
@@ -19,8 +20,10 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">床位</label>
-                            <select disabled class="form-control">
-                                <option>@BedId</option>
+                            <select @bind="ReservationModel.BedId" class="form-control">
+                                <option>請選擇床位</option>
+                                <option value="A">A床</option>
+                                <option value="B">B床</option>
                             </select>
                             <ValidationMessage For="@(() => ReservationModel.BedId)"></ValidationMessage>
                         </div>
@@ -38,7 +41,9 @@
                         <div class="form-group">
                             <label class="form-label">時段</label>
                             <select @bind="ReservationModel.SlOt" class="form-control">
-                                <option>@SlOt</option>
+                                <option>請選擇時段</option>
+                                <option value="morning">上午</option>
+                                <option value="afternoon">下午</option>
                             </select>
                             <ValidationMessage For="@(() => ReservationModel.SlOt)"></ValidationMessage>
                         </div>
@@ -54,25 +59,27 @@
                             <InputDate @bind-Value="ReservationModel.OperatingTime" class="form-control"></InputDate>
                             <ValidationMessage For="()=>ReservationModel.OperatingTime"></ValidationMessage>
                         </div>
-
-                        <button type="submit" class="btn btn-primary"> 儲存</button>
-                        <button class="btn btn-primary" @onclick="NavigateToListPage"> 回清單</button>
-
-
+                        <br />
+                        <div class="button-container">
+                            <button type="submit" class="btn btn-primary"> 儲存</button>
+                            <button class="btn btn-primary" @onclick="NavigateToListPage"> 回清單</button>
+                        </div>
+                        <br />
+                        <br />
                     </EditForm>
                 </div>
 
-                <div class="card-footer">
+@*                 <div class="card-footer">
                     Id:@ReturnReservation.Id<br />
-                    Nursing Station:@ReturnReservation.NursingStation <br />
-                    Bed_Id: @ReturnReservation.BedId <br />
-                    Patient_Id: @ReturnReservation.PatientId <br />
-                    Date: @ReturnReservation.Day.ToShortDateString() <br />
-                    Slot: @ReturnReservation.SlOt <br />
-                    Operator: @ReturnReservation.OperatOr<br />
-                    Operating Time: @ReturnReservation.OperatingTime.ToString("yyyy-MM-dd HH:mm:ss") <br />
+                    NursingStation:@ReturnReservation.NursingStation <br />
+                    BedId: @ReturnReservation.BedId <br />
+                    PatientId: @ReturnReservation.PatientId <br />
+                    Day: @ReturnReservation.Day.ToShortDateString() <br />
+                    SlOt: @ReturnReservation.SlOt <br />
+                    OperatOr: @ReturnReservation.OperatOr<br />
+                    OperatingTime: @ReturnReservation.OperatingTime.ToString("yyyy-MM-dd HH:mm:ss") <br />
                 </div>
-
+ *@
             </div>
         </div>
     </div>
@@ -85,28 +92,62 @@
     public Reservation ReservationModel { get; set; } = new();
 
     [Parameter] public int Id { get; set; }
-    [Parameter] public DateTime Day { get; set; }
-    [Parameter] public string BedId { get; set; }
-    [Parameter] public string SlOt { get; set; }
-
     private Reservation ReturnReservation = new Reservation();
-
-    protected override async Task OnInitializedAsync()
-    {
-        ReservationModel.Day = Day;
-        ReservationModel.BedId = BedId;
-        ReservationModel.SlOt = SlOt;
-        ReservationModel = await ReservationService.GetReservationByIdAsync(Id);
-    }
 
     private async Task HandleSave()
     {
+        if (ReservationModel.Id > 0)
+        {
             ReturnReservation = await ReservationService.UpdateReservationAsync(ReservationModel);
             ReservationModel = new();
-    }
+        }
+        else
+        {
+            ReturnReservation = await ReservationService.AddReservationAsync(ReservationModel);
+            ReservationModel = new();
+        }
 
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        if(Id > 0)
+        {
+            ReservationModel = await ReservationService.GetReservationByIdAsync(Id);
+        }
+    }
     private void NavigateToListPage()
     {
         NavigationManager.NavigateTo("reservationlist");
     }
 } 
+
+<style>
+      .card-header{
+       background-color: #bbafaf;
+       color: #fff;
+    }
+    .card-body {
+    }
+       .btn {
+        width: 80px;
+        height: 35px;
+        font-size: 14px;
+        font-weight: bold;
+    }
+        .btn-primary {
+        background-color: #bbafaf;
+        color: #fff;
+        border: 1px solid #bbafaf;
+    }
+        .btn-primary:hover {
+            background-color: #8d838c;
+                    border: 1px solid #8d838c;
+
+        }
+
+        .button-container {
+        display: flex;
+        justify-content: center; /* 水平置中 */
+        gap: 30px; /* 按鈕間距 */
+    }
+</style>

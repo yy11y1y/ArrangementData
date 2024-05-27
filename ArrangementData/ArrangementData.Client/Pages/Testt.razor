@@ -1,0 +1,172 @@
+﻿@page "/testtt"
+@using System.Globalization
+@inject NavigationManager NavigationManager
+
+<div class="calendar-container">
+    <div class="calendar-header">
+        <button class="nav-button" @onclick="PreviousMonth"> &lt; </button>
+        <h3>@currentDate.ToString("yyyy/MM", CultureInfo.InvariantCulture)</h3>
+        <button class="nav-button" @onclick="NextMonth"> &gt; </button>
+    </div>
+    <div class="calendar-body">
+        @foreach (var dayOfWeek in daysOfWeek)
+        {
+            <div class="calendar-day-header">@dayOfWeek</div>
+        }
+        @foreach (var day in GetCalendarDays())
+        {
+            <div class="calendar-day @GetDayClass(day)" @onclick="() => SelectDay(day)">
+                @day.Day
+            </div>
+        }
+    </div>
+    <div class="calendar-footer">
+        <p>@selectedDate.ToString("yyyy/MM/dd dddd 下午h:mm", CultureInfo.InvariantCulture)</p>
+        <div class="legend">
+            <div class="legend-item"><span class="today"></span>今天</div>
+            <div class="legend-item"><span class="selected"></span>點選日</div>
+            <div class="legend-item"><span class="full"></span>當日已額滿</div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private DateTime currentDate = new DateTime(2024, 5, 1); // 初始顯示5月
+    private DateTime selectedDate = DateTime.Now;
+    private readonly string[] daysOfWeek = { "週日", "週一", "週二", "週三", "週四", "週五", "週六" };
+
+    private void PreviousMonth()
+    {
+        Console.WriteLine("PreviousMonth clicked");
+        currentDate = currentDate.AddMonths(-1);
+        StateHasChanged();
+    }
+
+    private void NextMonth()
+    {
+        Console.WriteLine("NextMonth clicked");
+        currentDate = currentDate.AddMonths(1);
+        StateHasChanged();
+    }
+
+    private void SelectDay(DateTime day)
+    {
+        selectedDate = day;
+        StateHasChanged(); // 確保組件重新渲染
+    }
+
+    private IEnumerable<DateTime> GetCalendarDays()
+    {
+        var firstDayOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
+        var firstDayOfCalendar = firstDayOfMonth.AddDays(-(int)firstDayOfMonth.DayOfWeek);
+        for (int i = 0; i < 42; i++)
+        {
+            yield return firstDayOfCalendar.AddDays(i);
+        }
+    }
+
+    private string GetDayClass(DateTime day)
+    {
+        if (day.Date == DateTime.Now.Date)
+        {
+            return "today";
+        }
+        if (day.Date == selectedDate.Date)
+        {
+            return "selected";
+        }
+        // 在這裡添加更多的條件來判斷是否為已額滿的日子
+        return string.Empty;
+    }
+}
+
+<style>
+.calendar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    font-family: Arial, sans-serif;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 300px;
+    height: 50px;
+}
+
+.calendar-header h3 {
+    margin: 0;
+}
+
+.calendar-header .nav-button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.calendar-body {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    width: 300px;
+}
+
+.calendar-day-header,
+.calendar-day {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    cursor: pointer;
+    border: 1px solid #bbdefb;
+    border-radius: 4px;
+}
+
+.calendar-day.today {
+    background-color: #c8e6c9;
+}
+
+.calendar-day.selected {
+    background-color: #90caf9;
+}
+
+.calendar-day.full {
+    background-color: #eeeeee;
+    cursor: not-allowed;
+}
+
+.calendar-footer {
+    margin-top: 20px;
+}
+
+.legend {
+    display: flex;
+    justify-content: space-around;
+    width: 300px;
+    margin-top: 10px;
+}
+
+.legend-item span {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+    border-radius: 4px;
+}
+
+.today {
+    background-color: #c8e6c9;
+}
+
+.selected {
+    background-color: #90caf9;
+}
+
+.full {
+    background-color: #eeeeee;
+}
+
+</style>

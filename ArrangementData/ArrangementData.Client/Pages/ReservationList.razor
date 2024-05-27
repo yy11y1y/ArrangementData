@@ -32,7 +32,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var reservation in Reservations)
+                                @foreach (var reservation in Reservations.Where(r => !string.IsNullOrEmpty(r.PatientId)))
                                 {
                                     <tr>
                                         <td>@reservation.Id</td>
@@ -83,12 +83,12 @@
 
     private void NavigateToAddArrangementPage()
     {
-        NavigationManager.NavigateTo("/newcalendar");
+        NavigationManager.NavigateTo("/arrangepage");
     }
 
     private void Edit(Reservation model)
     {
-        NavigationManager.NavigateTo($"manage-arrange/{model.Id}");
+        NavigationManager.NavigateTo($"arrangepage/{model.Id}");
     }
 
     private async Task Delete(int Id)
