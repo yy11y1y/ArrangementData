@@ -7,11 +7,10 @@
 @if (Reservations.Count > 0)
 {
 <h6 class="center-content">
-    <img src="/images/1.jpg" style="width: 40px; height: 40px;" />
-    <span class="special-font"> A</span>
+    <span class="special-font"> Bed A</span>
 </h6>        
 <table class="table table-bordered">
-        <thead>
+        <thead class="day">
             <tr>
                 <th></th>
                 @foreach (var date in dates)
@@ -75,10 +74,10 @@
     </table>
 
 <h6 class="center-content">
-    <img src="/images/1.jpg" style="width: 40px; height: 40px;" />
-    <span class="special-font"> B</span>
-</h6>            <table class="table table-bordered">
-        <thead>
+    <span class="special-font">Bed B</span>
+</h6>            
+<table class="table table-bordered">
+        <thead class="day">
             <tr>
                 <th></th>
                 @foreach (var date in dates)
@@ -181,6 +180,9 @@ else
 
 
 <style>
+            body {
+        background-color: #e2ddd7; /* 設置背景顏色 */
+    }
     .table-container {
         max-width: 100%;
         overflow:auto;
@@ -191,14 +193,10 @@ else
     }
 
     th, td {
-        border: 1px solid #ddd;
+        border: 5px solid black; /* 修改線條顏色為深灰色，並使用 !important 確保生效 */
         padding: 8px;
         text-align: center;
         white-space: nowrap; /* Prevent text wrapping */
-    }
-
-    th {
-        background-color: #f2f2f2;
     }
 
     .btn {
@@ -207,11 +205,10 @@ else
         font-size: 14px;
         font-weight: bold;
     }
-
     .btn-secondary-disabled {
-        background-color: #675a6b;
+        background-color: #6c757d;
         color: #fff;
-        border: 1px solid #675a6b;
+        border: 1px solid #6c757d;
     }
 
     .btn-primary {
@@ -221,13 +218,16 @@ else
     }
 
         .btn-primary:hover {
-            background-color: #6c757d;
+            background-color: #6c5a6b;
+                    border: 1px solid #6c5a6b;
+
         }
 
-    table th,
-    table td {
+    table th, table td 
+    {
         border: none;
     }
+
     .center-content {
         display: flex;
         align-items: center; /* 垂直置中 */
@@ -235,6 +235,7 @@ else
     .special-font {
         font-family: 'Blippo', fantasy;
         font-size: 30px;
+        color: #5b4e55;
         /* 如果字體名稱帶有空格，請用單引號括起來 */
     }
         .time-slot {
@@ -242,5 +243,10 @@ else
         flex-direction: column;
         align-items: center; /* 垂直置中 */
         justify-content: center; /* 水平置中 */
+        color: #5b4e55;
+    }
+
+    .day {
+        color: #5b4e55;
     }
 </style>
