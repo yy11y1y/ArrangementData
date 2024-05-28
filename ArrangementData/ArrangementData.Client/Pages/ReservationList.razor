@@ -1,27 +1,57 @@
 ﻿@page "/reservationlist"
 @rendermode InteractiveAuto
+@using System.Globalization
 @using static SharedLibrary.Models.Reservation
 @using SharedLibrary.ReservationRepositories1
 @inject IReservationRepository ReservationService
 
+<!-- 日曆畫面 -->
 <div class="container">
     <div class="row">
-        <div class="col-md-40">
+        <div class="col-md-3 calendar-column">
+        <div class="calendar-container">
+    <div class="calendar-header">
+        <button class="nav-button" @onclick="PreviousMonth"> &lt; </button>
+        <h3>@currentDate.ToString("yyyy/MM", CultureInfo.InvariantCulture)</h3>
+        <button class="nav-button" @onclick="NextMonth"> &gt; </button>
+    </div>
+    <div class="calendar-body">
+        @foreach (var dayOfWeek in daysOfWeek)
+        {
+            <div class="calendar-day-header">@dayOfWeek</div>
+        }
+        @foreach (var day in GetCalendarDays())
+        {
+            <div class="calendar-day @GetDayClass(day)" @onclick="() => SelectDay(day)">
+                @day.Day
+            </div>
+        }
+    </div>
+    <div class="calendar-footer">
+        <div class="legend">
+            <div class="legend-item">
+                <span class="full"></span>
+                <div class="text">當日已額滿</div>
+            </div>
+        </div>
+    </div>
+</div>
+        </div>
+<!-- 預約列表 -->
+        <div class="col-md-9 calendar-column">
             <div class="card">
-                <div class="card">
-                    <div class="card-header">
-                        <button class="btn btn-primary float-end" @onclick="NavigateToAddArrangementPage">新增預約</button>
-                    </div>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="header-title">已預約清單</div>
+                    <button class="btn1 btn-primary" @onclick="NavigateToAddArrangementPage">新增預約</button>
                 </div>
                 @if (Reservations.Count > 0)
                 {
-                    <div class="card-header"> 已預約清單 </div>
                     <div class="card-body">
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>預約編號</th>
-                                    <th>護理站</th>
+@*                                     <th>預約編號</th>
+ *@                                    <th>護理站</th>
                                     <th>床位</th>
                                     <th>已排病歷號</th>
                                     <th>日期</th>
@@ -35,8 +65,8 @@
                                 @foreach (var reservation in Reservations.Where(r => !string.IsNullOrEmpty(r.PatientId)))
                                 {
                                     <tr>
-                                        <td>@reservation.Id</td>
-                                        <td>@reservation.NursingStation</td>
+@*                                         <td>@reservation.Id</td>
+ *@                                        <td>@reservation.NursingStation</td>
                                         <td>@reservation.BedId</td>
                                         <td>@reservation.PatientId</td>
                                         <td>@reservation.Day.ToShortDateString()</td>
@@ -45,8 +75,8 @@
                                         <td>@reservation.OperatingTime</td>
                                         <td>
                                             <div class="hstack gap-2">
-                                                <button class="btn  btn-info" @onclick="()=>Edit(reservation)"> Edit</button>
-                                                <button class="btn  btn-danger" @onclick="() => Delete(reservation.Id)"> Delete</button>
+                                                <button class="btn2  btn-info  " @onclick="()=>Edit(reservation)"> 編輯</button>
+                                                <button class="btn2  btn-danger" @onclick="() => Delete(reservation.Id)"> 刪除</button>
                                             </div>
                                         </td>
                                     </tr>
@@ -65,6 +95,61 @@
 </div>
 
 @code {
+    private DateTime currentDate = new DateTime(2024, 5, 1); // 初始顯示5月
+    private DateTime selectedDate = DateTime.Now;
+    private readonly string[] daysOfWeek = { "Sun.", "Mon.", "Tue.", "Wed.", "Thu.", "Fri.", "Sat." };
+
+    private void PreviousMonth()
+    {
+        Console.WriteLine("PreviousMonth clicked");
+        currentDate = currentDate.AddMonths(-1);
+        StateHasChanged();
+    }
+
+    private void NextMonth()
+    {
+        Console.WriteLine("NextMonth clicked");
+        currentDate = currentDate.AddMonths(1);
+        StateHasChanged();
+    }
+
+    private void SelectDay(DateTime day)
+    {
+        selectedDate = day;
+        StateHasChanged(); // 確保組件重新渲染
+    }
+
+    private IEnumerable<DateTime> GetCalendarDays()
+    {
+        var firstDayOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
+        var firstDayOfCalendar = firstDayOfMonth.AddDays(-(int)firstDayOfMonth.DayOfWeek);
+        for (int i = 0; i < 42; i++)
+        {
+            yield return firstDayOfCalendar.AddDays(i);
+        }
+    }
+
+    private string GetDayClass(DateTime day)
+    {
+        if (day.Date == DateTime.Now.Date)
+        {
+            return "today";
+        }
+        if (day.Date == selectedDate.Date)
+        {
+            return "selected";
+        }
+        if (day.Date == new DateTime(2024, 5, 29).Date || day.Date == new DateTime(2024, 5, 31).Date || day.Date == new DateTime(2024, 5, 20).Date || day.Date == new DateTime(2024, 5, 11).Date || day.Date == new DateTime(2024, 5, 19).Date)
+        {
+            return "full";
+        }
+        // 在這裡添加更多的條件來判斷是否為已額滿的日子
+        return string.Empty;
+    }
+
+
+
+
     private List<Reservation> Reservations { get; set; } = new();
 
     private async Task LoadReservations()
@@ -97,3 +182,204 @@
         await LoadReservations();
     }
 }
+
+    <style>
+        body {
+        background-color: #e2ddd7; /* 設置背景顏色 */
+    }
+    th, td {
+    font-size: 10px; /* 調整字體大小 */
+    font-weight: normal; /* 調整字體粗細 */
+}
+    .header-title {
+        font-weight: bold;
+        font-size: 13px;        
+    }
+
+    .btn1  {
+        width: 90px;
+        height: 35px;
+        font-size: 14px;
+        font-weight: bold;
+        border-radius: 4px;
+    }
+        .btn2 {
+        width: 42px;
+        height: 22px;
+        font-size: 12px;
+        font-weight: bold;
+        border: none;
+    }
+        .btn-primary {
+        background-color: #8d838c;
+        color: #fff;
+        border: 1px solid #8d838c;
+    }
+        .btn-primary:hover {
+            background-color: #8d838c;
+            border: 1px solid #8d838c;
+        }
+        .btn-info {
+             background-color: #D8BFD8;
+             color: #444444;
+             border:none; /* 保持原色 */
+             filter: drop-shadow(2px 2px 2px #000); 
+        }        
+         .btn-info:hover {
+             background-color: #D8BFD8;
+             color: #444444;
+             border:none; /* 保持原色 */
+             opacity: 0.8;
+         }
+        .btn-danger {
+             background-color: #C0C0C0;
+             border: none; /* 保持原色 */     
+             filter: drop-shadow(2px 2px 2px #000); 
+             color: #444444;
+        }
+        .btn-danger:hover {
+              background-color: #C0C0C0;
+             border: none; /* 保持原色 */     
+             color: #444444;
+            opacity: 0.8;
+        }
+            .calendar-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        font-family: 'monospace';
+        font-size: 13px;
+    }
+
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 300px;
+        height: 50px;
+    }
+
+        .calendar-header h3 {
+            margin: 0;
+        }
+
+        .calendar-header .nav-button {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+    .calendar-body {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+        width: 300px;
+    }
+
+    .calendar-day-header,
+    .calendar-day {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 40px;
+        cursor: pointer;
+        border: 1px solid #e2ddd7;
+        border-radius: 4px;
+                    background-color: white;
+    }
+
+        .calendar-day.today {
+            font-weight:bold ;
+            background-color: white;
+        }
+
+        .calendar-day.selected {
+            background-color: #90caf9;
+        }
+
+        .calendar-day.full {
+            background-color: #bbafaf;
+            cursor: not-allowed;
+        }
+
+    .calendar-footer {
+        margin-top: 25px;
+                display: flex;
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .legend {
+        display: flex;
+        justify-content: space-around;
+        width: 280px;
+        margin-top: 10px;
+    }
+
+      .legend-item {
+        display: flex;
+        width: 1000px;
+        margin-right: 240px;
+      }
+    .legend-item span {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        margin-right: 5px;
+        border-radius: 4px;
+        width: 15px;
+    }
+
+    .today {
+        background-color: #e2ddd7;
+    }
+
+    .selected {
+        background-color: #FFC0CB;
+    }
+
+    .full {
+        background-color: #bbafaf;
+    }
+    .text{
+        width: 100px;
+    }
+
+
+    .calendar-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        font-family: 'monospace';
+        font-size: 13px; /* 縮小字體大小 */
+        transform: scale(0.85); /* 縮小整個日曆 */
+        transform-origin: top left; /* 縮小的原點 */
+    }
+
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 250px; /* 調整寬度 */
+        height: 50px;
+    }
+
+    .calendar-header h3 {
+        margin: 0;
+    }
+
+    .calendar-header .nav-button {
+        background: none;
+        border: none;
+        font-size: 17px;
+        cursor: pointer;
+    }
+
+    .calendar-body {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+        width: 250px; /* 調整寬度 */
+    }
+    </style>
